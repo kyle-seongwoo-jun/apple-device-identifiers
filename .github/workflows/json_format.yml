@@ -2,9 +2,11 @@ name: JSON formatting checker
 
 on:
   push:
-    branches: [main]
+    paths:
+      - "mac-device-identifiers*.json"
   pull_request:
-    branches: [main]
+    paths:
+      - "mac-device-identifiers*.json"
 
 jobs:
   format:
