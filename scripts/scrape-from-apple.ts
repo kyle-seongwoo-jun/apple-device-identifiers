@@ -59,7 +59,7 @@ const devices = ([] as Device[]).concat(
     )
 )
 const dict = toDict(devices)
-const json = JSON.stringify(dict, null, 4)
+const json = JSON.stringify(dict, null, 2)
 await Deno.writeTextFile('mac-device-identifiers.json', json)
 
 console.log('generated.')
