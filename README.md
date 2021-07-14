@@ -13,3 +13,6 @@ $ deno run --allow-net --allow-write scripts/scrape-from-apple.ts
 - [Identify your iMac model](https://support.apple.com/en-us/HT201634)
 - [Identify your Mac mini model](https://support.apple.com/en-us/HT201894)
 - [Identify your Mac Pro model](https://support.apple.com/en-us/HT202888)
+
+## See also
+- [fieldnotescommunities/ios-device-identifiers](https://github.com/fieldnotescommunities/ios-device-identifiers)
