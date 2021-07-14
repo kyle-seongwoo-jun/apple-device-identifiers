@@ -1,0 +1,29 @@
+name: JSON formatting checker
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+
+      - name: Format JSON files
+        run: |
+          npx jsonlint -i mac-device-identifiers.json
+          npx jsonlint -i mac-device-identifiers-unique.json
+
+      - name: Check JSON files have changed
+        run: |
+          git diff --exit-code --quiet mac-device-identifiers*.json
