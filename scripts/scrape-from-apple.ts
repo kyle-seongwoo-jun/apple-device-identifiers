@@ -3,7 +3,7 @@ interface Device {
     name: string,
 }
 
-interface Dict {
+interface DeviceDictionary {
     [id: string]: string | string[]
 }
 
@@ -25,30 +25,41 @@ async function loadDevicesFrom(url: string) {
         const ids = group[7].replace('&nbsp;', ' ').replace(';', ',').split(', ')
         const name = group[1]
         ids.forEach(id => devices.push({ id, name }))
-    });
+    })
 
     return devices
 }
 
-function toDict(devices: { id: string, name: string }[]) {
-    const dict: Dict = {}
+function toDict(devices: Device[]) {
+    const dict: DeviceDictionary = {}
+
+    const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
+    devices.sort((a, b) => collator.compare(a.id, b.id))
+
     devices.forEach(device => {
         if (!Object.keys(dict).includes(device.id)) {
             dict[device.id] = device.name
         } else if (typeof dict[device.id] === "string") {
-            dict[device.id] = [dict[device.id] as string, device.name]
+            dict[device.id] = [dict[device.id] as string, device.name].sort()
         } else {
-            (dict[device.id] as string[]).push(device.name)
+            const array = dict[device.id] as string[]
+            array.push(device.name)
+            array.sort()
         }
     })
 
     return dict
 }
 
-const devices = ([] as Device[]).concat(...await Promise.all(
-    Object.values(websites).map(url => loadDevicesFrom(url)))
+console.log('generating...')
+
+const devices = ([] as Device[]).concat(
+    ...await Promise.all(
+        Object.values(websites).map(url => loadDevicesFrom(url))
+    )
 )
 const dict = toDict(devices)
-const json = JSON.stringify(dict)
+const json = JSON.stringify(dict, null, 4)
+await Deno.writeTextFile('mac-device-identifiers.json', json)
 
-console.log(json)
+console.log('generated.')
