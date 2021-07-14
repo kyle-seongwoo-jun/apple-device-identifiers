@@ -1,3 +1,5 @@
+import { DOMParser } from 'https://deno.land/x/deno_dom@v0.1.12-alpha/deno-dom-wasm.ts'
+
 interface Device {
     id: string,
     name: string,
@@ -17,8 +19,18 @@ const websites = {
 }
 
 async function loadDevicesFrom(url: string) {
-    const html = await fetch(url).then(res => res.text())
-    const matches = [...html.matchAll(/<strong>([^<]+?)(<br>\n |&nbsp;)?<\/strong>(.+\n)?(.+\n)?(.+\n)?Model Identifier:(&nbsp;| )(.+?)(&nbsp;)?<br>/g)]
+    // request HTML from URL
+    const doc = await fetch(url).then(res => res.text()).then(html => new DOMParser().parseFromString(html, 'text/html'))
+
+    // get HTML element 
+    const div = doc?.querySelector('#sections')
+    if (!div) {
+        console.error(`[ERROR] failed to parse HTML from ${url}`)
+        return []
+    }
+
+    // parse with regexp
+    const matches = [...div.innerHTML.matchAll(/<strong>([^<]+?)(<br>\n |&nbsp;)?<\/strong>(.+\n)?(.+\n)?(.+\n)?Model Identifier:(&nbsp;| )(.+?)(&nbsp;)?<br>/g)]
 
     const devices: Device[] = []
     matches.forEach(group => {
@@ -33,9 +45,11 @@ async function loadDevicesFrom(url: string) {
 function toDict(devices: Device[]) {
     const dict: DeviceDictionary = {}
 
+    // natural sort by id
     const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
     devices.sort((a, b) => collator.compare(a.id, b.id))
 
+    // array to object
     devices.forEach(device => {
         if (!Object.keys(dict).includes(device.id)) {
             dict[device.id] = device.name
