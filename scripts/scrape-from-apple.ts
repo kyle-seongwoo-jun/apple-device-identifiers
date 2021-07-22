@@ -30,11 +30,12 @@ async function loadDevicesFrom(url: string) {
     }
 
     // parse with regexp
-    const matches = [...div.innerHTML.matchAll(/<strong>([^<]+?)(<br>\n |&nbsp;)?<\/strong>(.+\n)?(.+\n)?(.+\n)?Model Identifier:(&nbsp;| )(.+?)(&nbsp;)?<br>/g)]
+    const html = div.innerHTML.replaceAll('&nbsp;', ' ')
+    const matches = [...html.matchAll(/<strong>([^<]+?)(<br>\n)? ?<\/strong>(.+\n)?(.+\n)?(.+\n)?Model Identifier: (.+?) ?<br>/g)]
 
     const devices: Device[] = []
     matches.forEach(group => {
-        const ids = group[7].replace('&nbsp;', ' ').replace(';', ',').split(', ')
+        const ids = group[6].replace(';', ',').split(', ')
         const name = group[1]
         ids.forEach(id => devices.push({ id, name }))
     })
