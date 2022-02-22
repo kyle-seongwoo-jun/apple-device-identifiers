@@ -29,3 +29,9 @@ jobs:
       - name: Check JSON files have changed
         run: |
           git diff --exit-code --quiet mac-device-identifiers*.json
+
+      - name: Check JSON length is same
+        run: |
+          length1=`cat mac-device-identifiers.json | jq length`
+          length2=`cat mac-device-identifiers-unique.json | jq length`
+          test $length1 = $length2
