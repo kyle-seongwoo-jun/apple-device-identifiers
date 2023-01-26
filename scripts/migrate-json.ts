@@ -16,12 +16,15 @@ if (newKeys.size === 0) {
 }
 
 // add new keys to dict2
+let hasConflict = false
 newKeys.forEach(key => {
     const value = dict1[key]
     if (typeof value === 'string') {
         dict2[key] = value
     } else {
         dict2[key] = "YOU NEED TO MIGRATE THIS DEVICE MANUALLY"
+
+        hasConflict = true
         console.warn(`[WARN] ${key} has multiple values: ${value}`)
     }
 })
@@ -36,4 +39,5 @@ sortedKeys.forEach(key => sortedDict[key] = dict2[key])
 const json = JSON.stringify(sortedDict, null, 2)
 await Deno.writeTextFile('mac-device-identifiers-unique.json', json)
 
-console.log('done.')
+console.log(hasConflict ? 'done with conflict.' : 'done.')
+Deno.exit(hasConflict ? 1 : 0)

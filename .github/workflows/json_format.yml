@@ -14,12 +14,12 @@ jobs:
 
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Install Node.js, NPM and Yarn
-        uses: actions/setup-node@v2
+      - name: Install Node.js, NPM
+        uses: actions/setup-node@v3
         with:
-          node-version: "14"
+          node-version: 16
 
       - name: Format JSON files
         run: |

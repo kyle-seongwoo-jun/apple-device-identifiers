@@ -1,0 +1,41 @@
+name: Scrap from Apple
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 1' # Every Monday at 00:00 UTC
+
+jobs:
+  scrap:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Install Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Run scrape-from-apple.ts
+        run: |
+          deno run --allow-net --allow-write scripts/scrape-from-apple.ts
+
+      - name: Run migrate-json.ts
+        continue-on-error: true
+        run: |
+          deno run --allow-read --allow-write scripts/migrate-json.ts
+
+      - name: Get current date
+        id: date
+        run: |
+          echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+          echo "MONTH_YEAR=$(date +'%b %Y')" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v4
+        with:
+          title: "[${{ steps.date.outputs.MONTH_YEAR }}] Update mac-device-identifiers.json"
+          commit-message: "[${{ steps.date.outputs.DATE }}] Update mac-device-identifiers.json"
+          branch: scrapping
