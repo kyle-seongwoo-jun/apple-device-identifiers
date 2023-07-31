@@ -1,12 +1,12 @@
 # apple-device-identifiers
 
-A json file for mapping iOS, iPadOS, tvOS, watchOS, and macOS device identifiers to some human readable equivalent.
+JSON files for mapping iOS, iPadOS, tvOS, watchOS, and macOS device identifiers to some human readable equivalent.
 
 ## Genrerate JSON file
 
 ```shell
 # iOS, iPadOS, tvOS, watchOS
-deno run --allow-run --allow-write scripts/scrape-from-xcode.ts
+deno run --allow-run --allow-read --allow-write scripts/scrape-from-xcode.ts
 
 # macOS
 deno run --allow-net --allow-write scripts/scrape-from-apple.ts
