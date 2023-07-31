@@ -3,10 +3,10 @@ name: JSON formatting checker
 on:
   push:
     paths:
-      - "mac-device-identifiers*.json"
+      - "*-device-identifiers*.json"
   pull_request:
     paths:
-      - "mac-device-identifiers*.json"
+      - "*-device-identifiers*.json"
 
 jobs:
   format:
@@ -23,14 +23,17 @@ jobs:
 
       - name: Format JSON files
         run: |
+          npx jsonlint -i ios-device-identifiers.json
+          npx jsonlint -i tvos-device-identifiers.json
+          npx jsonlint -i watchos-device-identifiers.json
           npx jsonlint -i mac-device-identifiers.json
           npx jsonlint -i mac-device-identifiers-unique.json
 
       - name: Check JSON files have changed
         run: |
-          git diff --exit-code --quiet mac-device-identifiers*.json
+          git diff --exit-code --quiet *-device-identifiers*.json
 
-      - name: Check JSON length is same
+      - name: Check mac-device-identifiers.json is unique
         run: |
           length1=`cat mac-device-identifiers.json | jq length`
           length2=`cat mac-device-identifiers-unique.json | jq length`
