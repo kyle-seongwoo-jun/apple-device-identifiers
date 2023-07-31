@@ -21,7 +21,7 @@ async function generateJsonFile(platform: { name: string; file: string }) {
     const old = await Deno.readTextFile(platform.file)
         .catch(() => "{}")
         .then((s) => JSON.parse(s) as { [key: string]: string });
-    const merged = { ...old, ...dict };
+    const merged = { ...dict, ...old };
     const sorted = naturalSort(merged);
 
     console.log(`Writing ${platform.file}...`);
