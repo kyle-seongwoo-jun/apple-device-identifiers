@@ -15,10 +15,17 @@ function naturalSort(dict: { [key: string]: string }) {
 
 async function generateJsonFile(platform: { name: string; file: string }) {
     console.log(`Generating ${platform.file}...`);
-    const dict = await scrapeFromXcode(platform.name).then(naturalSort);
+    const dict = await scrapeFromXcode(platform.name);
+
+    console.log(`Merging with previous ${platform.file}...`);
+    const old = await Deno.readTextFile(platform.file)
+        .catch(() => "{}")
+        .then((s) => JSON.parse(s) as { [key: string]: string });
+    const merged = { ...old, ...dict };
+    const sorted = naturalSort(merged);
 
     console.log(`Writing ${platform.file}...`);
-    const json = JSON.stringify(dict, null, 2);
+    const json = JSON.stringify(sorted, null, 2);
     await Deno.writeTextFile(platform.file, json);
 }
 
