@@ -13,6 +13,13 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v3
 
+      - name: Check Xcode version
+        run: |
+          xcode-select -p
+          xcodebuild -version
+          xcodebuild -showsdks
+
+
       - name: Install Deno
         uses: denoland/setup-deno@v1
         with:
