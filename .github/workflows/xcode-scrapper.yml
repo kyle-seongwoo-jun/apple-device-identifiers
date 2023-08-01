@@ -3,15 +3,31 @@ name: Scrap from Xcode
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * 1' # Every Monday at 00:00 UTC
+    - cron: "0 0 * * 1" # Every Monday at 00:00 UTC
 
 jobs:
   scrap:
-    runs-on: macos-latest
+    # update to newer version when available
+    # https://github.com/actions/runner-images#available-images
+    runs-on: macos-13
 
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v3
+
+      - name: Check Xcode installation
+        run: ls /Applications | grep Xcode
+
+      - name: Use latest Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest
+
+      - name: Check Xcode version
+        run: |
+          xcode-select -p
+          xcodebuild -version
+          xcodebuild -showsdks
 
       - name: Install Deno
         uses: denoland/setup-deno@v1

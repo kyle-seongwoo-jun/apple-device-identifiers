@@ -7,11 +7,21 @@ async function scrapeFromXcode(platform: string) {
     return obj;
 }
 
-// iPad14,3-A to iPad14,3
-function removeSuffix(dict: { [key: string]: string }) {
+function cleanUp(dict: { [key: string]: string }) {
     const newDict = {} as { [key: string]: string };
     Object.keys(dict).forEach((key) => {
+        // remove suffix: iPad14,3-A to iPad14,3
         const newKey = key.includes("-") ? key.split("-")[0] : key;
+        if (key !== newKey) {
+            console.info(`Renamed: "${key}" to "${newKey}": "${dict[key]}"`);
+        }
+
+        // skip *Family*: MacFamily, RealityFamily
+        if (newKey.includes("Family")) {
+            console.info(`Skipped: "${newKey}": "${dict[key]}"`);
+            return;
+        }
+
         newDict[newKey] = dict[key];
     });
     return newDict;
@@ -19,7 +29,7 @@ function removeSuffix(dict: { [key: string]: string }) {
 
 async function generateJsonFile(platform: { name: string; file: string }) {
     console.log(`Generating ${platform.file}...`);
-    const dict = await scrapeFromXcode(platform.name).then(removeSuffix);
+    const dict = await scrapeFromXcode(platform.name).then(cleanUp);
 
     console.log(`Merging with previous ${platform.file}...`);
     const old = await Deno.readTextFile(platform.file)
