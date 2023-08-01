@@ -22,7 +22,8 @@ if [ "$PLATFORM" != "iPhoneOS" ] && [ "$PLATFORM" != "AppleTVOS" ] && [ "$PLATFO
     exit 1
 fi
 
-DB_FILE="/Applications/Xcode.app/Contents/Developer/Platforms/$PLATFORM.platform/usr/standalone/device_traits.db"
+XCODE_PATH=$(xcode-select -p) # /Applications/Xcode.app/Contents/Developer
+DB_FILE="$XCODE_PATH/Platforms/$PLATFORM.platform/usr/standalone/device_traits.db"
 
 if [ ! -f "$DB_FILE" ]; then
     echo "Error: $DB_FILE not found"
