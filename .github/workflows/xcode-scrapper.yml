@@ -13,12 +13,19 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v3
 
+      - name: Check Xcode installation
+        run: ls /Applications/Xcode*
+
+      - name: Use latest Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest
+
       - name: Check Xcode version
         run: |
           xcode-select -p
           xcodebuild -version
           xcodebuild -showsdks
-
 
       - name: Install Deno
         uses: denoland/setup-deno@v1
