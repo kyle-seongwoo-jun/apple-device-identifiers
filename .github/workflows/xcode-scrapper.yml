@@ -20,7 +20,7 @@ jobs:
 
       - name: Run scrape-from-xcode.ts
         run: |
-          deno run --allow-run --allow-write scripts/scrape-from-xcode.ts
+          deno run --allow-run --allow-read --allow-write scripts/scrape-from-xcode.ts
 
       - name: Get current date
         id: date
