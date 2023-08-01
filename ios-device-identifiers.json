@@ -1,6 +1,7 @@
 {
-  "arm64": "iPhone Simulator",
   "i386": "iPhone Simulator",
+  "x86_64": "iPhone Simulator",
+  "arm64": "iPhone Simulator",
   "iPad1,1": "iPad",
   "iPad1,2": "iPad",
   "iPad2,1": "iPad 2",
@@ -139,6 +140,5 @@
   "iPod5,1": "iPod touch (5th generation)",
   "iPod7,1": "iPod touch (6th generation)",
   "iPod9,1": "iPod touch (7th generation)",
-  "MacFamily20,1": "Mac",
-  "x86_64": "iPhone Simulator"
+  "MacFamily20,1": "Mac"
 }

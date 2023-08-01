@@ -15,8 +15,21 @@ function removeSuffix(dict: { [key: string]: string }) {
 }
 
 const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
-function naturalSort(dict: { [key: string]: string }) {
-    const sortedKeys = [...Object.keys(dict)].sort((a, b) => collator.compare(a, b));
+const simulators = ['i386', 'x86_64', 'arm64'];
+function compare(a: string, b: string) {
+    // Sort simulators to the top
+    if (simulators.includes(a) && simulators.includes(b)) {
+        return simulators.indexOf(a) - simulators.indexOf(b);
+    } else if (simulators.includes(a)) {
+        return -1;
+    } else if (simulators.includes(b)) {
+        return 1;
+    }
+    return collator.compare(a, b);
+}
+
+function sort(dict: { [key: string]: string }) {
+    const sortedKeys = [...Object.keys(dict)].sort(compare);
     const sortedDict = {} as { [key: string]: string };
     sortedKeys.forEach((key) => (sortedDict[key] = dict[key]));
     return sortedDict;
@@ -31,7 +44,7 @@ async function generateJsonFile(platform: { name: string; file: string }) {
         .catch(() => "{}")
         .then((s) => JSON.parse(s) as { [key: string]: string });
     const merged = { ...dict, ...old };
-    const sorted = naturalSort(merged);
+    const sorted = sort(merged);
 
     console.log(`Writing ${platform.file}...`);
     const json = JSON.stringify(sorted, null, 2);
