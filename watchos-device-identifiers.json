@@ -37,5 +37,10 @@
   "Watch6,15": "Apple Watch Series 8 (GPS)",
   "Watch6,16": "Apple Watch Series 8 (GPS + Cellular)",
   "Watch6,17": "Apple Watch Series 8 (GPS + Cellular)",
-  "Watch6,18": "Apple Watch Ultra"
+  "Watch6,18": "Apple Watch Ultra",
+  "Watch7,1": "Apple Watch Series 9 (GPS)",
+  "Watch7,2": "Apple Watch Series 9 (GPS)",
+  "Watch7,3": "Apple Watch Series 9 (GPS + Cellular)",
+  "Watch7,4": "Apple Watch Series 9 (GPS + Cellular)",
+  "Watch7,5": "Apple Watch Ultra 2"
 }
