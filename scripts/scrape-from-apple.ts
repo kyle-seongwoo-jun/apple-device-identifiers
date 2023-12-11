@@ -1,4 +1,4 @@
-import { DOMParser } from 'https://deno.land/x/deno_dom@v0.1.12-alpha/deno-dom-wasm.ts'
+import { DOMParser, Element, HTMLDocument } from './deps.ts'
 
 interface Device {
     id: string,
@@ -18,15 +18,34 @@ const websites = {
     'Mac Pro': 'https://support.apple.com/en-us/HT202888',
 }
 
-async function loadDevicesFrom(url: string) {
+async function loadDevicesFrom(url: string): Promise<Device[]> {
     // request HTML from URL
-    const doc = await fetch(url).then(res => res.text()).then(html => new DOMParser().parseFromString(html, 'text/html'))
+    const html = await fetch(url).then(res => res.text())
+    const document = new DOMParser().parseFromString(html, 'text/html')
 
-    // get HTML element 
-    const div = doc?.querySelector('#sections')
-    if (!div) {
-        console.error(`[ERROR] failed to parse HTML from ${url}`)
+    if (!document) {
+        console.error('[ERROR] failed to parse HTML from', url)
         return []
+    }
+
+    const header = document.querySelector('.gb-header')?.innerText
+    const isNewPage = header !== undefined
+    console.log(`[INFO] parsing ${url} (${isNewPage ? `new, ${header}` : 'old'})`)
+
+    try {
+        const devices = isNewPage ? parseNewPage(document) : parseOldPage(document)
+        console.log(`[INFO] parsed ${devices.length} devices from ${url}`)
+        return devices
+    } catch (e) {
+        console.error('[ERROR] failed to parse HTML from', url, 'error:', e)
+        return []
+    }
+}
+
+function parseOldPage(document: HTMLDocument): Device[] {
+    const div = document.querySelector('#sections')
+    if (!div) {
+        throw new Error('failed to find #sections element')
     }
 
     // parse with regexp
@@ -38,6 +57,25 @@ async function loadDevicesFrom(url: string) {
         const ids = group[6].replace(';', ',').split(', ')
         const name = group[1]
         ids.forEach(id => devices.push({ id, name }))
+    })
+
+    return devices
+}
+
+function parseNewPage(document: HTMLDocument): Device[] {
+    const MODEL_IDENTIFIER = 'Model Identifier: '
+
+    const names = [...document.querySelectorAll('p.gb-paragraph b')].map(b => (b as Element).innerText)
+    const ids = [...document.querySelectorAll('p.gb-paragraph')].filter(p => (p as Element).innerText.startsWith(MODEL_IDENTIFIER)).map(p => (p as Element).innerText.replace(MODEL_IDENTIFIER, ''))
+
+    if (names.length !== ids.length) {
+        throw new Error('names and ids are not matched')
+    }
+
+    const devices: Device[] = []
+    names.forEach((name, i) => {
+        const id = ids[i]
+        devices.push({ id, name })
     })
 
     return devices
