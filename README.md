@@ -2,6 +2,31 @@
 
 JSON files for mapping iOS, iPadOS, tvOS, watchOS, and macOS device identifiers to some human readable equivalent.
 
+## Usage
+
+You can download JSON files from the repository.
+
+```shell
+curl https://raw.githubusercontent.com/kyle-seongwoo-jun/apple-device-identifiers/main/ios-device-identifiers.json > ios-device-identifiers.json
+```
+
+Here is a simple example using the JSON file with bash and [jq](https://stedolan.github.io/jq/).
+
+```shell
+function get_apple_device_name() {
+  local URL="https://raw.githubusercontent.com/kyle-seongwoo-jun/apple-device-identifiers/main"
+  local OS="$1" # ios, tvos, watchos, mac
+  local IDENTIFIER="$2"
+  curl "$URL/$OS-device-identifiers.json" | jq -r ".[\"$IDENTIFIER\"]"
+}
+
+$ get_apple_device_name ios iPhone16,1
+iPhone 15 Pro
+
+$ get_apple_device_name mac Mac15,11
+MacBook Pro (16-inch, Nov 2023)
+```
+
 ## Genrerate JSON file
 
 ```shell
