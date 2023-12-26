@@ -65,18 +65,27 @@ function parseOldPage(document: HTMLDocument): Device[] {
 function parseNewPage(document: HTMLDocument): Device[] {
     const MODEL_IDENTIFIER = 'Model Identifier: '
 
-    const names = [...document.querySelectorAll('p.gb-paragraph b')].map(b => (b as Element).innerText)
+    const names = [...document.querySelectorAll('p.gb-paragraph b')].map(b => (b as Element).innerText.trim())
     const ids = [...document.querySelectorAll('p.gb-paragraph')].filter(p => (p as Element).innerText.startsWith(MODEL_IDENTIFIER)).map(p => (p as Element).innerText.replace(MODEL_IDENTIFIER, ''))
 
     if (names.length !== ids.length) {
         throw new Error('names and ids are not matched')
     }
 
-    const devices: Device[] = []
-    names.forEach((name, i) => {
-        const id = ids[i]
-        devices.push({ id, name })
-    })
+    const devices = names.map((name, i) => {
+        let id = ids[i]
+
+        // Apple might have temporarily miswritten the document, as currently, on https://support.apple.com/en-us/102852,
+        // there is no line break between Model Identifier and Part Numbers in the description of the Mac mini (2023) model.
+        // Therefore, a separate handling for this model has been added
+        // (planned to be removed when the document is updated).
+        if (id.includes('Part Numbers:')) {
+            id = id.split('Part Numbers:')[0].trim()
+        }
+
+        // some devices have multiple identifiers
+        return id.split('; ').map(id => ({ id, name }))
+    }).flat()
 
     return devices
 }
