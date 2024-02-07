@@ -23,11 +23,9 @@ jobs:
 
       - name: Format JSON files
         run: |
-          npx jsonlint -i ios-device-identifiers.json
-          npx jsonlint -i tvos-device-identifiers.json
-          npx jsonlint -i watchos-device-identifiers.json
-          npx jsonlint -i mac-device-identifiers.json
-          npx jsonlint -i mac-device-identifiers-unique.json
+          for file in *.json; do
+            npx jsonlint -i "$file"
+          done
 
       - name: Check JSON files have changed
         run: |
