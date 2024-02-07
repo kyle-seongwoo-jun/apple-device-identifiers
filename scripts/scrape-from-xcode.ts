@@ -47,6 +47,7 @@ const platforms = [
     { name: "iPhoneOS", file: "ios-device-identifiers.json" },
     { name: "WatchOS", file: "watchos-device-identifiers.json" },
     { name: "AppleTVOS", file: "tvos-device-identifiers.json" },
+    { name: "XROS", file: "visionos-device-identifiers.json" },
 ];
 await Promise.all(platforms.map((p) => generateJsonFile(p)));
 

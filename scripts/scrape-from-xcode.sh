@@ -9,7 +9,7 @@
 # Requires sqlite3: https://www.sqlite.org/index.html
 # Tested with Xcode 14.3.1
 
-# Platform: iPhoneOS | AppleTVOS | WatchOS
+# Platform: iPhoneOS | AppleTVOS | WatchOS | XROS
 PLATFORM=$1
 
 if [ -z "$PLATFORM" ]; then
@@ -17,7 +17,7 @@ if [ -z "$PLATFORM" ]; then
     exit 1
 fi
 
-if [ "$PLATFORM" != "iPhoneOS" ] && [ "$PLATFORM" != "AppleTVOS" ] && [ "$PLATFORM" != "WatchOS" ]; then
+if [ "$PLATFORM" != "iPhoneOS" ] && [ "$PLATFORM" != "AppleTVOS" ] && [ "$PLATFORM" != "WatchOS" ] && [ "$PLATFORM" != "XROS" ]; then
     echo "Error: Invalid platform: $PLATFORM"
     exit 1
 fi
