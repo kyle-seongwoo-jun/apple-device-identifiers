@@ -1,8 +1,8 @@
 import { sortDictionary } from "./sort.ts";
 
 async function scrapeFromXcode(platform: string) {
-    const process = Deno.run({ cmd: ["bash", "-c", `scripts/scrape-from-xcode.sh ${platform}`], stdout: "piped" });
-    const output = await process.output().then((o) => new TextDecoder().decode(o));
+    const command = new Deno.Command("bash", { args: ["-c", `scripts/scrape-from-xcode.sh ${platform}`], stdout: "piped" });
+    const output = await command.output().then((o) => new TextDecoder().decode(o.stdout));
     const obj = JSON.parse(output) as { [key: string]: string };
     return obj;
 }
