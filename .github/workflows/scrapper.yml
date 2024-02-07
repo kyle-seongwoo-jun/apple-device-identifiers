@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Deno
         uses: denoland/setup-deno@v1
@@ -34,7 +34,7 @@ jobs:
           echo "MONTH_YEAR=$(date +'%b %Y')" >> $GITHUB_OUTPUT
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v4
+        uses: peter-evans/create-pull-request@v6
         with:
           title: "[${{ steps.date.outputs.MONTH_YEAR }}] Update mac-device-identifiers.json"
           commit-message: "[${{ steps.date.outputs.DATE }}] Update mac-device-identifiers.json"
