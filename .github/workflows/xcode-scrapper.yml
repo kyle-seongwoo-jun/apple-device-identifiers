@@ -9,7 +9,7 @@ jobs:
   scrap:
     # update to newer version when available
     # https://github.com/actions/runner-images#available-images
-    runs-on: macos-14-large
+    runs-on: macos-14
 
     steps:
       - name: Check out Git repository
