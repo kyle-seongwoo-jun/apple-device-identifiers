@@ -38,12 +38,11 @@ jobs:
       - name: Get current date
         id: date
         run: |
-          echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
           echo "MONTH_YEAR=$(date +'%b %Y')" >> $GITHUB_OUTPUT
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
-          title: "[${{ steps.date.outputs.MONTH_YEAR }}] Update apple device identifiers"
-          commit-message: "[${{ steps.date.outputs.DATE }}] Update apple device identifiers"
+          title: "feat: add identifiers for ${{ steps.date.outputs.MONTH_YEAR }} models"
+          commit-message: "feat: add identifiers for ${{ steps.date.outputs.MONTH_YEAR }} models"
           branch: scrapping-xcode
