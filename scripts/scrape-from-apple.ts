@@ -29,15 +29,15 @@ class AppleWebsiteParser {
         // request HTML from URL
         const html = await fetch(url).then(res => res.text())
         const document = new DOMParser().parseFromString(html, 'text/html')
-    
+
         if (!document) {
             console.error('[ERROR] failed to parse HTML from', url)
             return []
         }
-    
+
         const pageTitle = document.querySelector('.gb-header')?.innerText
         console.log(`[INFO] parsing ${url} (${pageTitle})`)
-    
+
         try {
             const devices = this.parseDevicesFrom(document)
             console.log(`[INFO] parsed ${devices.length} devices from ${url}`)
@@ -91,10 +91,10 @@ class AppleWebsiteParser {
 
     public toDict(devices: Device[]) {
         const dict: DeviceDictionary = {}
-    
+
         // natural sort by id
         devices.sort((a, b) => this.collator.compare(a.id, b.id))
-    
+
         // array to object
         devices.forEach(device => {
             if (!Object.keys(dict).includes(device.id)) {
@@ -107,7 +107,7 @@ class AppleWebsiteParser {
                 array.sort()
             }
         })
-    
+
         return dict
     }
 }
