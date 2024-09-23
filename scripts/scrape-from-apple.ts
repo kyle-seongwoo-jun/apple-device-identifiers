@@ -79,7 +79,11 @@ class AppleWebsiteParser {
         const is2024Renewed = names.some(name => name.endsWith(':'))
         if (is2024Renewed) {
             const names = this._parseTextsFrom(document, 'h2.gb-header')
+                .filter(text => text.includes('Mac')) // "Learn More" added on MacPro website
             return names
+        } else {
+            // 2024 currently, only "MacBook" has old website
+            console.log('[DEBUG] old website detected')
         }
 
         return names
