@@ -10,49 +10,57 @@ interface DeviceDictionary {
 }
 
 class AppleWebsiteParser {
-    private MODEL_IDENTIFIER = 'Model Identifier: '
-    private collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
+    private static MODEL_IDENTIFIER = 'Model Identifier: '
 
-    public async loadDevicesFrom(url: string): Promise<Device[]>
-    public async loadDevicesFrom(urls: string[]): Promise<Device[]>
-    public async loadDevicesFrom(urlOrUrls: string | string[]): Promise<Device[]> {
-        if (typeof urlOrUrls === 'string') {
-            return this._loadDevicesFrom(urlOrUrls)
-        } else {
-            return ([] as Device[]).concat(
-                ...await Promise.all(urlOrUrls.map(url => this._loadDevicesFrom(url)))
-            )
-        }
+    private collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
+    private domParser = new DOMParser()
+
+    public async loadDevicesFromUrls(urls: string[]): Promise<Device[]> {
+        return ([] as Device[]).concat(
+            ...await Promise.all(urls.map(url => this.loadDevicesFromUrl(url)))
+        )
     }
 
-    private async _loadDevicesFrom(url: string): Promise<Device[]> {
+    public async loadDevicesFromUrl(url: string): Promise<Device[]> {
         // request HTML from URL
-        const html = await fetch(url).then(res => res.text())
-        const document = new DOMParser().parseFromString(html, 'text/html')
-
-        if (!document) {
-            console.error('[ERROR] failed to parse HTML from', url)
-            return []
-        }
+        const document = await this._loadDocumentFromUrl(url).catch(e => {
+            console.error('[ERROR] HTML document loading failed. url:', url)
+            throw e
+        })
 
         const pageTitle = document.querySelector('.gb-header')?.innerText
         console.log(`[INFO] parsing ${url} (${pageTitle})`)
 
         try {
-            const devices = this.parseDevicesFrom(document)
+            const devices = this._parseDevicesFromDocument(document)
             console.log(`[INFO] parsed ${devices.length} devices from ${url}`)
             return devices
         } catch (e) {
-            console.error('[ERROR] failed to parse HTML from', url, 'error:', e)
-            return []
+            console.error('[ERROR] device parsing failed. url:', url)
+            throw e
         }
     }
 
-    private parseDevicesFrom(document: HTMLDocument): Device[] {
-        const names = this.parseNamesFrom(document)
-        const ids = this.parseIdsFrom(document)
+    private async _loadDocumentFromUrl(url: string): Promise<HTMLDocument> {
+        const response = await fetch(url)
+        if (!response.ok) {
+            throw new Error(`HTTP request failed. status: ${response.status} ${response.statusText}, url: ${url}`)
+        }
+
+        const html = await response.text()
+        const document = this.domParser.parseFromString(html, 'text/html')
+        if (!document) {
+            throw new Error(`HTML parsing failed. url: ${url}`)
+        }
+
+        return document
+    }
+
+    private _parseDevicesFromDocument(document: HTMLDocument): Device[] {
+        const names = this._parseNamesFrom(document)
+        const ids = this._parseIdsFrom(document)
         if (names.length !== ids.length) {
-            throw new Error('names and ids are not matched')
+            throw new Error(`names and ids are not matched. names: ${names.length}, ids: ${ids.length}`)
         }
 
         const devices = names.map((name, i) => {
@@ -63,29 +71,30 @@ class AppleWebsiteParser {
         return devices
     }
 
-    private parseNamesFrom(document: HTMLDocument): string[] {
-        const names = this.parseTextsFrom(document, 'p.gb-paragraph b')
+    private _parseNamesFrom(document: HTMLDocument): string[] {
+        const names = this._parseTextsFrom(document, 'p.gb-paragraph b')
 
         // if there's a colon at the end of these field, it's 2024 renewed website
         // so we need to parse names in new way
         const is2024Renewed = names.some(name => name.endsWith(':'))
         if (is2024Renewed) {
-            const names = this.parseTextsFrom(document, 'h2.gb-header')
+            const names = this._parseTextsFrom(document, 'h2.gb-header')
             return names
         }
 
         return names
     }
 
-    private parseIdsFrom(document: HTMLDocument): string[] {
-        const ids = this.parseTextsFrom(document, 'p.gb-paragraph')
-            .filter(text => text.startsWith(this.MODEL_IDENTIFIER))
-            .map(text => text.replace(this.MODEL_IDENTIFIER, ''))
+    private _parseIdsFrom(document: HTMLDocument): string[] {
+        const { MODEL_IDENTIFIER } = AppleWebsiteParser
+        const ids = this._parseTextsFrom(document, 'p.gb-paragraph')
+            .filter(text => text.startsWith(MODEL_IDENTIFIER))
+            .map(text => text.replace(MODEL_IDENTIFIER, ''))
 
         return ids
     }
 
-    private parseTextsFrom(document: HTMLDocument, selector: string): string[] {
+    private _parseTextsFrom(document: HTMLDocument, selector: string): string[] {
         return [...document.querySelectorAll(selector)].map(b => (b as Element).innerText.trim())
     }
 
@@ -124,7 +133,7 @@ const MAC_WEBSITES = {
 console.log('generating...')
 
 const parser = new AppleWebsiteParser()
-const devices = await parser.loadDevicesFrom(Object.values(MAC_WEBSITES))
+const devices = await parser.loadDevicesFromUrls(Object.values(MAC_WEBSITES))
 const dict = parser.toDict(devices)
 const json = JSON.stringify(dict, null, 2)
 await Deno.writeTextFile('mac-device-identifiers.json', json)
