@@ -9,7 +9,7 @@ jobs:
   scrap:
     # update to newer version when available
     # https://github.com/actions/runner-images#available-images
-    runs-on: macos-14
+    runs-on: macos-15
 
     steps:
       - name: Check out Git repository
@@ -18,7 +18,7 @@ jobs:
       - name: Use latest Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: "16.0"
+          xcode-version: latest
 
       - name: Check Xcode version
         run: |
