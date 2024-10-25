@@ -126,12 +126,12 @@ class AppleWebsiteParser {
 }
 
 const MAC_WEBSITES = {
-    'MacBook': 'https://support.apple.com/en-us/HT201608',
-    'MacBook Air': 'https://support.apple.com/en-us/HT201862',
-    'MacBook Pro': 'https://support.apple.com/en-us/HT201300',
-    'iMac': 'https://support.apple.com/en-us/HT201634',
-    'Mac mini': 'https://support.apple.com/en-us/HT201894',
-    'Mac Pro': 'https://support.apple.com/en-us/HT202888',
+    'MacBook': 'https://support.apple.com/en-us/103257',
+    'MacBook Air': 'https://support.apple.com/en-us/102869',
+    'MacBook Pro': 'https://support.apple.com/en-us/108052',
+    'iMac': 'https://support.apple.com/en-us/108054',
+    'Mac mini': 'https://support.apple.com/en-us/102852',
+    'Mac Pro': 'https://support.apple.com/en-us/102887',
 }
 
 console.log('generating...')
