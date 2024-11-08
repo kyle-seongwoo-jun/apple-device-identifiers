@@ -1,43 +1,38 @@
-const jsonString1 = Deno.readTextFileSync('mac-device-identifiers.json')
-const jsonString2 = Deno.readTextFileSync('mac-device-identifiers-unique.json')
+const SOURCE_FILE = 'mac-device-identifiers.json'
+const DEST_FILE = 'mac-device-identifiers-unique.json'
 
-const dict1 = JSON.parse(jsonString1) as { [key: string]: string | string[] }
-const dict2 = JSON.parse(jsonString2) as { [key: string]: string }
+const sourceJsonString = Deno.readTextFileSync(SOURCE_FILE)
+const destJsonString = Deno.readTextFileSync(DEST_FILE)
 
-const keys1 = new Set(Object.keys(dict1))
-const keys2 = new Set(Object.keys(dict2))
+const sourceDict = JSON.parse(sourceJsonString) as { [key: string]: string | string[] }
+const destDict = JSON.parse(destJsonString) as { [key: string]: string }
 
-// check if all keys in dict1 are in dict2
-const newKeys = new Set([...keys1].filter(x => !keys2.has(x)))
-if (newKeys.size === 0) {
-    console.log('there is no new device identifier.')
-    console.log('done.')
-    Deno.exit(0)
-}
-
-// add new keys to dict2
-let hasConflict = false
-newKeys.forEach(key => {
-    const value = dict1[key]
+// migrate source to dest
+const conflicts: [string, string[]][] = []
+Object.entries(sourceDict).forEach(([key, value]) => {
     if (typeof value === 'string') {
-        dict2[key] = value
+        // add or update
+        destDict[key] = value
+    } else if (key in destDict) {
+        // already migrated
     } else {
-        dict2[key] = "YOU NEED TO MIGRATE THIS DEVICE MANUALLY"
-
-        hasConflict = true
-        console.warn(`[WARN] ${key} has multiple values: ${value}`)
+        destDict[key] = "YOU NEED TO MIGRATE THIS DEVICE MANUALLY"
+        conflicts.push([key, value])
     }
 })
+conflicts.forEach(([key, value]) => {
+    console.warn(`[WARN] ${key} has multiple values: ${value}`)
+})
 
-// sort keys
+// sort by keys
 const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
-const sortedKeys = [...Object.keys(dict2)].sort((a, b) => collator.compare(a, b))
+const sortedKeys = [...Object.keys(destDict)].sort((a, b) => collator.compare(a, b))
 const sortedDict = {} as { [key: string]: string }
-sortedKeys.forEach(key => sortedDict[key] = dict2[key])
+sortedKeys.forEach(key => sortedDict[key] = destDict[key])
 
 // write to file
 const json = JSON.stringify(sortedDict, null, 2)
-await Deno.writeTextFile('mac-device-identifiers-unique.json', json)
+await Deno.writeTextFile(DEST_FILE, json)
 
-console.log(hasConflict ? 'done with conflict.' : 'done.')
-Deno.exit(hasConflict ? 1 : 0)
+console.log(conflicts.length > 0 ? 'done with conflict.' : 'done.')
+Deno.exit(conflicts.length > 0 ? 1 : 0)
