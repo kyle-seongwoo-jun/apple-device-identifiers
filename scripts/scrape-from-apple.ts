@@ -131,6 +131,7 @@ const MAC_WEBSITES = {
     'MacBook Pro': 'https://support.apple.com/en-us/108052',
     'iMac': 'https://support.apple.com/en-us/108054',
     'Mac mini': 'https://support.apple.com/en-us/102852',
+    'Mac Studio': 'https://support.apple.com/en-us/102231',
     'Mac Pro': 'https://support.apple.com/en-us/102887',
 }
 
