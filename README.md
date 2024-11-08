@@ -53,4 +53,5 @@ deno run --allow-read --allow-write scripts/migrate-json.ts
 - [Identify your MacBook Pro model](https://support.apple.com/en-us/108052)
 - [Identify your iMac model](https://support.apple.com/en-us/108054)
 - [Identify your Mac mini model](https://support.apple.com/en-us/102852)
+- [Identify your Mac Studio model](https://support.apple.com/en-us/102231)
 - [Identify your Mac Pro model](https://support.apple.com/en-us/102887)
