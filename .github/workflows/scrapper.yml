@@ -3,7 +3,7 @@ name: Scrap from Apple
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * 1' # Every Monday at 00:00 UTC
+    - cron: "0 0 * * 1" # Every Monday at 00:00 UTC
 
 jobs:
   scrap:
@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Deno
-        uses: denoland/setup-deno@v1
+        uses: denoland/setup-deno@v2
         with:
           deno-version: v1.x
 
@@ -27,14 +27,19 @@ jobs:
         run: |
           deno run --allow-read --allow-write scripts/migrate-json.ts
 
-      - name: Get current date
-        id: date
+      - name: Generate commit message
+        id: commit-message
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          MODEL: gpt-4o-mini
         run: |
-          echo "MONTH_YEAR=$(date +'%B %Y')" >> $GITHUB_OUTPUT
+          COMMIT_MSG=$(./scripts/commit-message.sh)
+          echo "COMMIT_MSG=$COMMIT_MSG" >> $GITHUB_OUTPUT
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v7
+        if: ${{ steps.commit-message.outputs.COMMIT_MSG != '' }}
         with:
-          title: "feat: add identifiers for ${{ steps.date.outputs.MONTH_YEAR }} models"
-          commit-message: "feat: add identifiers for ${{ steps.date.outputs.MONTH_YEAR }} models"
+          title: ${{ steps.commit-message.outputs.COMMIT_MSG }}
+          commit-message: ${{ steps.commit-message.outputs.COMMIT_MSG }}
           branch: scrap/apple-websites
