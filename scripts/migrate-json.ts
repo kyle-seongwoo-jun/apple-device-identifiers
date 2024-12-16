@@ -9,6 +9,7 @@ const destDict = JSON.parse(destJsonString) as { [key: string]: string }
 
 // migrate source to dest
 const conflicts: [string, string[]][] = []
+const deletedKeys = new Set(Object.keys(destDict))
 Object.entries(sourceDict).forEach(([key, value]) => {
     if (typeof value === 'string') {
         // add or update
@@ -19,7 +20,11 @@ Object.entries(sourceDict).forEach(([key, value]) => {
         destDict[key] = "YOU NEED TO MIGRATE THIS DEVICE MANUALLY"
         conflicts.push([key, value])
     }
+    deletedKeys.delete(key)
 })
+// remove deleted items
+deletedKeys.forEach(key => delete destDict[key])
+// warn about conflicts
 conflicts.forEach(([key, value]) => {
     console.warn(`[WARN] ${key} has multiple values: ${value}`)
 })
