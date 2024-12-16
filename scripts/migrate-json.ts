@@ -1,43 +1,77 @@
 const SOURCE_FILE = 'mac-device-identifiers.json'
 const DEST_FILE = 'mac-device-identifiers-unique.json'
+const CONFLICT_MESSAGE = "YOU NEED TO MIGRATE THIS DEVICE MANUALLY"
 
-const sourceJsonString = Deno.readTextFileSync(SOURCE_FILE)
-const destJsonString = Deno.readTextFileSync(DEST_FILE)
-
-const sourceDict = JSON.parse(sourceJsonString) as { [key: string]: string | string[] }
-const destDict = JSON.parse(destJsonString) as { [key: string]: string }
+// read json files
+const sourceJson = readJsonFile<string | string[]>(SOURCE_FILE)
+const destinationJson = readJsonFile<string>(DEST_FILE)
 
 // migrate source to dest
-const conflicts: [string, string[]][] = []
-const deletedKeys = new Set(Object.keys(destDict))
-Object.entries(sourceDict).forEach(([key, value]) => {
-    if (typeof value === 'string') {
-        // add or update
-        destDict[key] = value
-    } else if (key in destDict) {
-        // already migrated
-    } else {
-        destDict[key] = "YOU NEED TO MIGRATE THIS DEVICE MANUALLY"
-        conflicts.push([key, value])
-    }
-    deletedKeys.delete(key)
-})
-// remove deleted items
-deletedKeys.forEach(key => delete destDict[key])
-// warn about conflicts
-conflicts.forEach(([key, value]) => {
-    console.warn(`[WARN] ${key} has multiple values: ${value}`)
+let conflicts = 0
+const migratedJson = migrateJson(sourceJson, destinationJson, {
+    // warn about conflicts
+    onConflict: (key, value) => {
+        console.warn(`"${key}":`, value)
+        conflicts++
+    },
 })
 
 // sort by keys
-const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
-const sortedKeys = [...Object.keys(destDict)].sort((a, b) => collator.compare(a, b))
-const sortedDict = {} as { [key: string]: string }
-sortedKeys.forEach(key => sortedDict[key] = destDict[key])
+const sortedJson = sortJson(migratedJson)
 
 // write to file
-const json = JSON.stringify(sortedDict, null, 2)
-await Deno.writeTextFile(DEST_FILE, json)
+writeJsonFile(DEST_FILE, sortedJson)
 
-console.log(conflicts.length > 0 ? 'done with conflict.' : 'done.')
-Deno.exit(conflicts.length > 0 ? 1 : 0)
+// exit (1 if there are conflicts, 0 otherwise)
+console.log(conflicts > 0 ? `done with ${conflicts} conflicts.` : 'done.')
+Deno.exit(conflicts > 0 ? 1 : 0)
+
+function readJsonFile<TValue>(path: string): { [key: string]: TValue } {
+    const jsonString = Deno.readTextFileSync(path)
+    return JSON.parse(jsonString) as { [key: string]: TValue }
+}
+
+function writeJsonFile(path: string, json: { [key: string]: string }) {
+    const jsonString = JSON.stringify(json, null, 2)
+    Deno.writeTextFileSync(path, jsonString)
+}
+
+function migrateJson(
+    source: { [key: string]: string | string[] },
+    destination: { [key: string]: string },
+    { onConflict }: { onConflict?: (key: string, value: string[]) => void } = {},
+) {
+    const migrated = { ...destination }
+    const deletedKeys = new Set(Object.keys(destination))
+    const conflicts: [string, string[]][] = []
+
+    Object.entries(source).forEach(([key, value]) => {
+        if (typeof value === 'string') {
+            // add or update
+            migrated[key] = value
+        } else if (key in destination) {
+            // already migrated
+            // do nothing
+        } else {
+            migrated[key] = CONFLICT_MESSAGE
+            conflicts.push([key, value])
+        }
+        deletedKeys.delete(key)
+    })
+
+    // remove deleted items
+    deletedKeys.forEach(key => delete migrated[key])
+
+    // handle conflicts
+    conflicts.forEach(([key, value]) => onConflict?.(key, value))
+
+    return migrated
+}
+
+function sortJson(json: { [key: string]: string }) {
+    const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
+    const sortedKeys = [...Object.keys(json)].sort((a, b) => collator.compare(a, b))
+    const sortedJson = {} as { [key: string]: string }
+    sortedKeys.forEach(key => sortedJson[key] = json[key])
+    return sortedJson
+}
