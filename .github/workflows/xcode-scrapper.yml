@@ -15,16 +15,21 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v4
 
+      - name: Check installed Xcode
+        run: |
+          for X_CODE_PATH in /Applications/Xcode*.app; do
+            if [ ! -L "$X_CODE_PATH" ]; then
+              version=$(plutil -extract CFBundleShortVersionString raw "$X_CODE_PATH/Contents/version.plist")
+              build=$(plutil -extract ProductBuildVersion raw "$X_CODE_PATH/Contents/version.plist")
+              license=$(plutil -extract licenseType raw "$X_CODE_PATH/Contents/Resources/LicenseInfo.plist")
+              echo "$X_CODE_PATH ($version / $build / $license)"
+            fi
+          done
+
       - name: Use latest Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest
-
-      - name: Check Xcode version
-        run: |
-          echo "Xcode path: $(xcode-select -p)"
-          xcodebuild -version
-          xcodebuild -showsdks
 
       - name: Install Deno
         uses: denoland/setup-deno@v2
