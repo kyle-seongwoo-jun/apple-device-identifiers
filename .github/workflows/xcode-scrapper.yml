@@ -1,6 +1,9 @@
 name: Scrap from Xcode
 
 on:
+  push:
+    branches:
+      - ci/xcode-version
   workflow_dispatch:
   schedule:
     - cron: "0 0 * * 1" # Every Monday at 00:00 UTC
@@ -14,6 +17,16 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
+
+      - name: Check installed Xcode
+        run: |
+          for file in /Applications/Xcode*.app; do
+            if [ ! -L "$file" ]; then
+              echo "$file"
+              cat "$file/Contents/version.plist"
+              cat "$file/Contents/Resources/LicenseInfo.plist"
+            fi
+          done
 
       - name: Use latest Xcode
         uses: maxim-lobanov/setup-xcode@v1
