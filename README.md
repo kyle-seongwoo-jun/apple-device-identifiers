@@ -27,7 +27,7 @@ $ get_apple_device_name mac Mac15,11
 MacBook Pro (16-inch, Nov 2023)
 ```
 
-## Genrerate JSON file
+## Generate JSON file
 
 ```shell
 # iOS, iPadOS, tvOS, watchOS, visionOS
