@@ -7,9 +7,9 @@ if [ -z "$OPENAI_API_KEY" ] || [ -z "$MODEL" ]; then
 fi
 
 # Get the diff content
-DIFF_CONTENT=$(git diff HEAD | sed 's/"/\\"/g' | sed "s/'/\\'/g" | tr '\n' ' ')
+GIT_DIFF=$(git diff HEAD)
 
-if [ -z "$DIFF_CONTENT" ]; then
+if [ -z "$GIT_DIFF" ]; then
   echo "No changes detected" >&2
   exit 0
 fi
@@ -18,21 +18,21 @@ fi
 JSON_BODY=$(cat <<EOF
 {
   "model": "$MODEL",
-  "messages": [{"role": "system", "content": "You are a helpful assistant generating git commit messages in Conventional Commits format."},
-               {"role": "user", "content": "Generate a concise git commit message for the following changes: $DIFF_CONTENT"}],
+  "input": [{"role": "system", "content": "You are a helpful assistant generating git commit messages in Conventional Commits format. Generate a concise git commit message from \`git diff\`. Please do not include any other text in your response including \`\`\`"},
+            {"role": "user", "content": $(jq -Rs . <<<"$GIT_DIFF")}],
   "temperature": 0.7
 }
 EOF
 )
 
 # Send the request to the OpenAI API
-RESPONSE=$(curl https://api.openai.com/v1/chat/completions \
+RESPONSE=$(curl https://api.openai.com/v1/responses \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $OPENAI_API_KEY" \
   -d "$JSON_BODY")
 
 # Extract the commit message from the response
-COMMIT_MSG=$(echo "$RESPONSE" | jq -r '.choices[0].message.content')
+COMMIT_MSG=$(echo "$RESPONSE" | jq -r '.output[] | select(.type == "message") | .content[0] .text')
 
 # Print the commit message
 echo "$COMMIT_MSG"
