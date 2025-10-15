@@ -1,6 +1,6 @@
 {
-  "iMac9,1": "iMac (Early 2009)",
-  "iMac10,1": "iMac (Late 2009)",
+  "iMac9,1": "iMac (20-inch / 24-inch, Early 2009)",
+  "iMac10,1": "iMac (21.5-inch / 27-inch, Late 2009)",
   "iMac11,2": "iMac (21.5-inch, Mid 2010)",
   "iMac11,3": "iMac (27-inch, Mid 2010)",
   "iMac12,1": "iMac (21.5-inch, Mid 2011)",
@@ -83,7 +83,7 @@
   "MacBookAir8,2": "MacBook Air (Retina, 13-inch, 2019)",
   "MacBookAir9,1": "MacBook Air (Retina, 13-inch, 2020)",
   "MacBookAir10,1": "MacBook Air (M1, 2020)",
-  "MacBookPro4,1": "MacBook Pro (Early 2008)",
+  "MacBookPro4,1": "MacBook Pro (15-inch / 17-inch, Early 2008)",
   "MacBookPro5,1": "MacBook Pro (15-inch, Late 2008)",
   "MacBookPro5,2": "MacBook Pro (17-inch, Early 2009 / Mid 2009)",
   "MacBookPro5,3": "MacBook Pro (15-inch, Mid 2009)",
