@@ -20,12 +20,12 @@ jobs:
 
       - name: Run scrape-from-apple.ts
         run: |
-          deno run --allow-net --allow-write scripts/scrape-from-apple.ts
+          deno run start:scrape-from-apple
 
       - name: Run migrate-json.ts
         continue-on-error: true
         run: |
-          deno run --allow-read --allow-write scripts/migrate-json.ts
+          deno run start:migrate-json
 
       - name: Generate commit message
         id: commit-message

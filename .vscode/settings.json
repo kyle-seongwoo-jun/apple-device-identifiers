@@ -4,5 +4,9 @@
     "deno.unstable": true,
     "deno.suggest.imports.hosts": {
         "https://deno.land": true
+    },
+    "editor.defaultFormatter": "denoland.vscode-deno",
+    "[typescript]": {
+      "editor.defaultFormatter": "denoland.vscode-deno"
     }
 }

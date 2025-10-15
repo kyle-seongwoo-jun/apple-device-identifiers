@@ -1,0 +1,18 @@
+{
+  "fmt": {
+    "semiColons": true,
+    "singleQuote": true,
+    "include": ["src/"]
+  },
+  "tasks": {
+    "dev:scrape-from-apple": "deno run --allow-run --allow-write --allow-read --watch src/scrape-from-apple.ts",
+    "dev:scrape-from-xcode": "deno run --allow-run --allow-write --allow-read --watch src/scrape-from-xcode.ts",
+    "dev:migrate-json": "deno run --allow-read --allow-write --watch src/migrate-json.ts",
+    "start:scrape-from-xcode": "deno run --allow-run --allow-write --allow-read src/scrape-from-xcode.ts",
+    "start:scrape-from-apple": "deno run --allow-net --allow-write src/scrape-from-apple.ts",
+    "start:migrate-json": "deno run --allow-read --allow-write src/migrate-json.ts"
+  },
+  "imports": {
+    "@b-fuze/deno-dom": "jsr:@b-fuze/deno-dom@^0.1.56"
+  }
+}

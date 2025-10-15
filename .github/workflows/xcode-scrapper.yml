@@ -38,7 +38,7 @@ jobs:
 
       - name: Run scrape-from-xcode.ts
         run: |
-          deno run --allow-run --allow-read --allow-write scripts/scrape-from-xcode.ts
+          deno run start:scrape-from-xcode
 
       - name: Generate commit message
         id: commit-message

@@ -31,11 +31,11 @@ MacBook Pro (16-inch, Nov 2023)
 
 ```shell
 # iOS, iPadOS, tvOS, watchOS, visionOS
-deno run --allow-run --allow-read --allow-write scripts/scrape-from-xcode.ts
+deno run start:scrape-from-xcode
 
 # macOS
-deno run --allow-net --allow-write scripts/scrape-from-apple.ts
-deno run --allow-read --allow-write scripts/migrate-json.ts
+deno run start:scrape-from-apple
+deno run start:migrate-json
 ```
 
 ## References (iOS, iPadOS, tvOS, watchOS)
