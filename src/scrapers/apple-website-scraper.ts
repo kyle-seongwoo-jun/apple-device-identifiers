@@ -1,4 +1,4 @@
-import { DOMParser, Element, HTMLDocument } from '@b-fuze/deno-dom';
+import { DOMParser, type HTMLDocument } from '@b-fuze/deno-dom';
 import type { DeviceDictionaryWithDuplicates } from './scraper.interface.ts';
 
 interface Device {
@@ -17,8 +17,6 @@ const MAC_WEBSITES = {
 };
 
 export class AppleWebsiteScraper {
-  private static MODEL_IDENTIFIER = 'Model Identifier: ';
-
   private collator = new Intl.Collator(undefined, {
     numeric: true,
     sensitivity: 'base',
@@ -86,7 +84,7 @@ export class AppleWebsiteScraper {
 
     const devices = names.map((name, i) => {
       const id = ids[i];
-      return id.split(/; |, /).map((id) => ({ id, name }));
+      return id.map((id) => ({ id, name }));
     }).flat();
 
     return devices;
@@ -110,11 +108,10 @@ export class AppleWebsiteScraper {
     return names;
   }
 
-  private _parseIdsFrom(document: HTMLDocument): string[] {
-    const { MODEL_IDENTIFIER } = AppleWebsiteScraper;
+  private _parseIdsFrom(document: HTMLDocument): string[][] {
     const ids = this._parseTextsFrom(document, 'p.gb-paragraph')
-      .filter((text) => text.startsWith(MODEL_IDENTIFIER))
-      .map((text) => text.replace(MODEL_IDENTIFIER, ''));
+      .map((text) => text.match(/[A-Za-z]+\d+,\d+/g))
+      .filter((match) => match) as string[][];
 
     return ids;
   }
@@ -123,8 +120,8 @@ export class AppleWebsiteScraper {
     document: HTMLDocument,
     selector: string,
   ): string[] {
-    return [...document.querySelectorAll(selector)].map((b) =>
-      (b as Element).innerText.trim()
+    return [...document.querySelectorAll(selector)].map((element) =>
+      element.textContent.trim()
     );
   }
 
