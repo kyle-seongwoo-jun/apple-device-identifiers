@@ -1,4 +1,4 @@
-import { DOMParser, Element, HTMLDocument } from './deps.ts'
+import { DOMParser, Element, HTMLDocument } from '@b-fuze/deno-dom'
 
 interface Device {
     id: string,
