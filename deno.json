@@ -1,4 +1,9 @@
 {
+  "fmt": {
+    "semiColons": true,
+    "singleQuote": true,
+    "include": ["src/"]
+  },
   "tasks": {
     "dev:scrape-from-apple": "deno run --allow-run --allow-write --allow-read --watch src/scrape-from-apple.ts",
     "dev:scrape-from-xcode": "deno run --allow-run --allow-write --allow-read --watch src/scrape-from-xcode.ts",
