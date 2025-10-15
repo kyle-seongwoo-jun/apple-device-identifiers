@@ -6,14 +6,19 @@ interface Device {
   name: string;
 }
 
-const MAC_WEBSITES = {
-  'MacBook': 'https://support.apple.com/en-us/103257',
-  'MacBook Air': 'https://support.apple.com/en-us/102869',
-  'MacBook Pro': 'https://support.apple.com/en-us/108052',
-  'iMac': 'https://support.apple.com/en-us/108054',
-  'Mac mini': 'https://support.apple.com/en-us/102852',
-  'Mac Studio': 'https://support.apple.com/en-us/102231',
-  'Mac Pro': 'https://support.apple.com/en-us/102887',
+interface ScrapeOptions {
+  locale?: string;
+}
+
+const APPLE_SUPPORT_URL = 'https://support.apple.com';
+const MAC_IDS = {
+  'MacBook': 103257,
+  'MacBookAir': 102869,
+  'MacBookPro': 108052,
+  'iMac': 108054,
+  'MacMini': 102852,
+  'MacStudio': 102231,
+  'MacPro': 102887,
 };
 
 export class AppleWebsiteScraper {
@@ -23,8 +28,11 @@ export class AppleWebsiteScraper {
   });
   private domParser = new DOMParser();
 
-  async scrape() {
-    const devices = await this.loadDevicesFromUrls(Object.values(MAC_WEBSITES));
+  async scrape({ locale = 'en-US' }: ScrapeOptions = {}) {
+    const urls = Object.values(MAC_IDS).map((id) =>
+      `${APPLE_SUPPORT_URL}/${locale.toLowerCase()}/${id}`
+    );
+    const devices = await this.loadDevicesFromUrls(urls);
     return this.toDict(devices);
   }
 

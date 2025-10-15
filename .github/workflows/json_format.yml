@@ -3,10 +3,10 @@ name: JSON formatting checker
 on:
   push:
     paths:
-      - "*-device-identifiers*.json"
+      - "**/*-device-identifiers*.json"
   pull_request:
     paths:
-      - "*-device-identifiers*.json"
+      - "**/*-device-identifiers*.json"
 
 jobs:
   format:
@@ -15,11 +15,6 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
-
-      - name: Install Node.js, NPM
-        uses: actions/setup-node@v4
-        with:
-          node-version: 16
 
       - name: Format JSON files
         run: |
