@@ -22,11 +22,6 @@ jobs:
         run: |
           deno run start:scrape-from-apple
 
-      - name: Run migrate-json.ts
-        continue-on-error: true
-        run: |
-          deno run start:migrate-json
-
       - name: Generate commit message
         id: commit-message
         env:

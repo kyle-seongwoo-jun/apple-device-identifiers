@@ -35,7 +35,6 @@ deno run start:scrape-from-xcode
 
 # macOS
 deno run start:scrape-from-apple
-deno run start:migrate-json
 ```
 
 ## References (iOS, iPadOS, tvOS, watchOS)
