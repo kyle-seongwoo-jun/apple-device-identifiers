@@ -3,12 +3,10 @@ import '@std/dotenv/load';
 import { AppleWebsiteScraper } from './scrapers/apple-website-scraper.ts';
 import type { DeviceDictionary } from './scraper.interface.ts';
 import { readFromFile, writeToFile } from './utils/io.ts';
+import { LOCALES } from './utils/locale.ts';
 import { mergeMacDeviceIdentifiers } from './utils/merge-mac-device-identifiers.ts';
 
 const scraper = new AppleWebsiteScraper();
-const LOCALES = [
-  'en-US',
-];
 const ORIGINAL_FILE = 'mac-device-identifiers.json';
 const UNIQUE_FILE = 'mac-device-identifiers-unique.json';
 

@@ -103,7 +103,9 @@ export class AppleWebsiteScraper {
 
     // if there's a colon at the end of these field, it's 2024 renewed website
     // so we need to parse names in new way
-    const is2024Renewed = names.some((name) => name.endsWith(':'));
+    const is2024Renewed = names.some((name) =>
+      name.endsWith(':') || name.endsWith('：') // japanese colon
+    );
     if (is2024Renewed) {
       const names = this._parseTextsFrom(document, 'h2.gb-header')
         .filter((text) => text.includes('Mac')); // "Learn More" added on MacPro website
