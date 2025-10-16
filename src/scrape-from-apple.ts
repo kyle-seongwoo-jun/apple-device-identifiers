@@ -1,5 +1,7 @@
+import '@std/dotenv/load';
+
 import { AppleWebsiteScraper } from './scrapers/apple-website-scraper.ts';
-import { DeviceDictionary } from './scrapers/scraper.interface.ts';
+import type { DeviceDictionary } from './scraper.interface.ts';
 import { readFromFile, writeToFile } from './utils/io.ts';
 import { mergeMacDeviceIdentifiers } from './utils/merge-mac-device-identifiers.ts';
 
@@ -22,26 +24,24 @@ async function generateJsonFile(locale: string) {
 
   console.log(`Merging with ${uniqueFile}...`);
   const old = await readFromFile<DeviceDictionary>(uniqueFile);
-  let conflicts = 0;
-  const mergedDict = mergeMacDeviceIdentifiers(dict, old, {
-    onConflict: (key, value) => {
-      console.warn(`"${key}":`, value);
-      conflicts++;
+  const mergedDict = await mergeMacDeviceIdentifiers(dict, old, {
+    onConflict: (key, values) => {
+      // when openai is not set, we need to migrate manually
+      console.warn(`[Conflict] "${key}":`, values);
+    },
+    onConflictResolved: (values, resolved) => {
+      console.info(`[Resolved] "${resolved}" from:`);
+      console.info(values);
     },
   });
   await writeToFile(uniqueFile, mergedDict);
-
-  return conflicts;
 }
-const conflicts = await Promise.all(
+await Promise.all(
   LOCALES.map((locale) => generateJsonFile(locale)),
-).then((results) => results.reduce((acc, conflict) => acc + conflict, 0));
+);
 
 // copy en-US to root
 Deno.copyFileSync(`data/en-US/${ORIGINAL_FILE}`, ORIGINAL_FILE);
 Deno.copyFileSync(`data/en-US/${UNIQUE_FILE}`, UNIQUE_FILE);
 
-console.log(
-  conflicts > 0 ? `Done! but with ${conflicts} conflicts.` : 'Done!',
-);
-Deno.exit(conflicts ? 1 : 0);
+console.log('Done!');

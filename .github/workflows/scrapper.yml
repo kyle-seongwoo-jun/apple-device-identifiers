@@ -21,6 +21,9 @@ jobs:
       - name: Run scrape-from-apple.ts
         run: |
           deno run start:scrape-from-apple
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: gpt-4o-mini
 
       - name: Generate commit message
         id: commit-message

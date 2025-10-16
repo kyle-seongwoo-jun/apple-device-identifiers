@@ -3,13 +3,17 @@
   "specifiers": {
     "jsr:@b-fuze/deno-dom@~0.1.56": "0.1.56",
     "jsr:@denosaurs/plug@1.1.0": "1.1.0",
+    "jsr:@openai/openai@^6.3.0": "6.3.0",
+    "jsr:@std/dotenv@~0.225.5": "0.225.5",
     "jsr:@std/encoding@1": "1.0.10",
     "jsr:@std/fmt@1": "1.0.8",
     "jsr:@std/fs@1": "1.0.19",
     "jsr:@std/internal@^1.0.10": "1.0.12",
     "jsr:@std/internal@^1.0.9": "1.0.12",
     "jsr:@std/path@1": "1.1.2",
-    "jsr:@std/path@^1.1.1": "1.1.2"
+    "jsr:@std/path@^1.1.1": "1.1.2",
+    "npm:@types/node@*": "24.2.0",
+    "npm:zod@3": "3.25.76"
   },
   "jsr": {
     "@b-fuze/deno-dom@0.1.56": {
@@ -26,6 +30,15 @@
         "jsr:@std/fs",
         "jsr:@std/path@1"
       ]
+    },
+    "@openai/openai@6.3.0": {
+      "integrity": "122c73a9070221b5394393b251319d94e330961f546d1932b8681ac96e57eeef",
+      "dependencies": [
+        "npm:zod"
+      ]
+    },
+    "@std/dotenv@0.225.5": {
+      "integrity": "9ce6f9d0ec3311f74a32535aa1b8c62ed88b1ab91b7f0815797d77a6f60c922f"
     },
     "@std/encoding@1.0.10": {
       "integrity": "8783c6384a2d13abd5e9e87a7ae0520a30e9f56aeeaa3bdf910a3eaaf5c811a1"
@@ -50,9 +63,26 @@
       ]
     }
   },
+  "npm": {
+    "@types/node@24.2.0": {
+      "integrity": "sha512-3xyG3pMCq3oYCNg7/ZP+E1ooTaGB4cG8JWRsqqOYQdbWNY4zbaV0Ennrd7stjiJEFZCaybcIgpTjJWHRfBSIDw==",
+      "dependencies": [
+        "undici-types"
+      ]
+    },
+    "undici-types@7.10.0": {
+      "integrity": "sha512-t5Fy/nfn+14LuOc2KNYg75vZqClpAiqscVvMygNnlsHBFpSXdJaYtXMcdNLpl/Qvc3P2cB3s6lOV51nqsFq4ag=="
+    },
+    "zod@3.25.76": {
+      "integrity": "sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ=="
+    }
+  },
   "workspace": {
     "dependencies": [
-      "jsr:@b-fuze/deno-dom@~0.1.56"
+      "jsr:@b-fuze/deno-dom@~0.1.56",
+      "jsr:@openai/openai@^6.3.0",
+      "jsr:@std/dotenv@~0.225.5",
+      "npm:zod@3"
     ]
   }
 }

@@ -33,7 +33,9 @@ MacBook Pro (16-inch, Nov 2023)
 # iOS, iPadOS, tvOS, watchOS, visionOS
 deno run start:scrape-from-xcode
 
-# macOS
+# macOS (OpenAI is optional, it needs to generate `mac-device-identifiers-unique.json`)
+OPENAI_API_KEY=... \
+OPENAI_MODEL=... \
 deno run start:scrape-from-apple
 ```
 

@@ -1,4 +1,4 @@
-import type { DeviceDictionary } from './scrapers/scraper.interface.ts';
+import type { DeviceDictionary } from './scraper.interface.ts';
 import { XcodeScraper } from './scrapers/xcode-scraper.ts';
 import { readFromFile } from './utils/io.ts';
 import { sortDictionary } from './utils/sort.ts';

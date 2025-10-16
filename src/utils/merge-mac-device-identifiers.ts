@@ -1,31 +1,33 @@
-import {
+import type {
   DeviceDictionary,
   DeviceDictionaryWithDuplicates,
-} from '../scrapers/scraper.interface.ts';
-
-const CONFLICT_MESSAGE = 'YOU NEED TO MIGRATE THIS DEVICE MANUALLY';
-
+} from '../scraper.interface.ts';
+import { ConflictResolver } from './conflict-resolver.ts';
 interface MergeMacDeviceIdentifiersOptions {
-  onConflict?: (key: string, value: string[]) => void;
+  onConflict?: (key: string, values: string[]) => void;
+  onConflictResolved?: (values: string[], resolved: string) => void;
 }
 
-export function mergeMacDeviceIdentifiers(
+const CONFLICT_MESSAGE = 'YOU NEED TO MIGRATE THIS DEVICE MANUALLY';
+const conflictResolver = new ConflictResolver();
+
+export async function mergeMacDeviceIdentifiers(
   source: DeviceDictionaryWithDuplicates,
   destination: DeviceDictionary,
   options: MergeMacDeviceIdentifiersOptions = {},
 ) {
   // migrate source to dest
-  const migratedJson = migrateJson(source, destination, options);
+  const migratedJson = await migrateJson(source, destination, options);
 
   // sort by keys
   const sortedJson = sortJson(migratedJson);
   return sortedJson;
 }
 
-function migrateJson(
+async function migrateJson(
   source: DeviceDictionaryWithDuplicates,
   destination: DeviceDictionary,
-  { onConflict }: MergeMacDeviceIdentifiersOptions = {},
+  { onConflict, onConflictResolved }: MergeMacDeviceIdentifiersOptions = {},
 ) {
   const migrated = { ...destination };
   const deletedKeys = new Set(Object.keys(destination));
@@ -39,8 +41,13 @@ function migrateJson(
       // already migrated
       // do nothing
     } else {
-      migrated[key] = CONFLICT_MESSAGE;
-      conflicts.push([key, value]);
+      // conflict
+      if (!conflictResolver.isAvailable) {
+        migrated[key] = CONFLICT_MESSAGE;
+        onConflict?.(key, value);
+      } else {
+        conflicts.push([key, value]);
+      }
     }
     deletedKeys.delete(key);
   });
@@ -49,7 +56,11 @@ function migrateJson(
   deletedKeys.forEach((key) => delete migrated[key]);
 
   // handle conflicts
-  conflicts.forEach(([key, value]) => onConflict?.(key, value));
+  await Promise.all(conflicts.map(async ([key, values]) => {
+    const resolved = await conflictResolver.resolve(values);
+    migrated[key] = resolved;
+    onConflictResolved?.(values, resolved);
+  }));
 
   return migrated;
 }

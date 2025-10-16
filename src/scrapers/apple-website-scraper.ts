@@ -1,5 +1,5 @@
 import { DOMParser, type HTMLDocument } from '@b-fuze/deno-dom';
-import type { DeviceDictionaryWithDuplicates } from './scraper.interface.ts';
+import type { DeviceDictionaryWithDuplicates } from '../scraper.interface.ts';
 
 interface Device {
   id: string;

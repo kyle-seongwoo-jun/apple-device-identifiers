@@ -1,4 +1,4 @@
-import type { DeviceDictionary } from './scraper.interface.ts';
+import type { DeviceDictionary } from '../scraper.interface.ts';
 
 interface XcodeScraperOptions {
   onRename?: (key: string, newKey: string, value: string) => void;

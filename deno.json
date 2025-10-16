@@ -5,12 +5,15 @@
     "include": ["src/"]
   },
   "tasks": {
-    "dev:scrape-from-apple": "deno run --allow-ret --allow-read --allow-write --watch src/scrape-from-apple.ts",
+    "dev:scrape-from-apple": "deno run --allow-ret --allow-read --allow-write --allow-env --watch src/scrape-from-apple.ts",
     "dev:scrape-from-xcode": "deno run --allow-run --allow-read --allow-write --watch src/scrape-from-xcode.ts",
-    "start:scrape-from-apple": "deno run --allow-net --allow-read --allow-write src/scrape-from-apple.ts",
+    "start:scrape-from-apple": "deno run --allow-net --allow-read --allow-write --allow-env src/scrape-from-apple.ts",
     "start:scrape-from-xcode": "deno run --allow-run --allow-read --allow-write src/scrape-from-xcode.ts"
   },
   "imports": {
-    "@b-fuze/deno-dom": "jsr:@b-fuze/deno-dom@^0.1.56"
+    "@b-fuze/deno-dom": "jsr:@b-fuze/deno-dom@^0.1.56",
+    "@openai/openai": "jsr:@openai/openai@^6.3.0",
+    "@std/dotenv": "jsr:@std/dotenv@^0.225.5",
+    "zod": "npm:zod@3"
   }
 }
