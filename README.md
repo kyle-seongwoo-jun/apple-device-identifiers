@@ -46,6 +46,7 @@ deno run start:scrape-from-apple
 - [Identify your iPod model](https://support.apple.com/en-us/103823)
 - [Identify your Apple Watch](https://support.apple.com/en-us/108056)
 - [Identify your Apple TV model](https://support.apple.com/en-us/101605)
+- [Identify your Apple Vision Pro model](https://support.apple.com/en-us/125375)
 
 ## Sources (macOS)
 
