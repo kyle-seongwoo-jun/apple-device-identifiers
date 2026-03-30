@@ -75,6 +75,12 @@
   "Mac16,12": "MacBook Air (13-inch, M4, 2025)",
   "Mac16,13": "MacBook Air (15-inch, M4, 2025)",
   "Mac17,2": "MacBook Pro (14-inch, M5)",
+  "Mac17,3": "MacBook Air (13-inch, M5)",
+  "Mac17,4": "MacBook Air (15-inch, M5)",
+  "Mac17,6": "MacBook Pro (16-inch, M5 Pro or M5 Max)",
+  "Mac17,7": "MacBook Pro (14-inch, M5 Pro or M5 Max)",
+  "Mac17,8": "MacBook Pro (16-inch, M5 Pro or M5 Max)",
+  "Mac17,9": "MacBook Pro (14-inch, M5 Pro or M5 Max)",
   "MacBook5,2": [
     "MacBook (13-inch, Early 2009)",
     "MacBook (13-inch, Mid 2009)"
