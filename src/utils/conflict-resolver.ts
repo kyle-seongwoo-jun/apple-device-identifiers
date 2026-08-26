@@ -1,5 +1,6 @@
-import { LLM } from './llm.ts';
+import { NoObjectGeneratedError } from 'ai';
 import { z } from 'zod';
+import { LLM } from './llm.ts';
 
 const MERGE_DEVICE_IDENTIFIER_PROMPT = `
 You are a helpful assistant merging device identifiers.
@@ -27,9 +28,6 @@ const MERGE_DEVICE_IDENTIFIER_SCHEMA = z.object({
   ),
 });
 
-const DEFAULT_MODEL = 'gpt-4o-mini';
-const OPENAI_MODEL = Deno.env.get('OPENAI_MODEL') || DEFAULT_MODEL;
-
 export class ConflictResolver {
   private readonly llm: LLM;
 
@@ -42,18 +40,18 @@ export class ConflictResolver {
   }
 
   async resolve(values: string[]): Promise<string> {
-    const { merged } = await this.llm.transform({
-      systemPrompt: MERGE_DEVICE_IDENTIFIER_PROMPT,
-      jsonSchema: MERGE_DEVICE_IDENTIFIER_SCHEMA,
-      model: OPENAI_MODEL,
-      input: values.join('\n'),
-    }) ?? {};
+    try {
+      const { merged } = await this.llm.transform({
+        systemPrompt: MERGE_DEVICE_IDENTIFIER_PROMPT,
+        jsonSchema: MERGE_DEVICE_IDENTIFIER_SCHEMA,
+        input: values.join('\n'),
+      });
+      return merged;
+    } catch (error) {
+      if (!NoObjectGeneratedError.isInstance(error)) throw error;
 
-    if (!merged) {
       console.error('Failed to merge device identifiers.', values);
       return values.join(' / ');
     }
-
-    return merged;
   }
 }
