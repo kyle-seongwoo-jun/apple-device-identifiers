@@ -82,48 +82,96 @@ export class AppleWebsiteScraper {
   }
 
   private _parseDevicesFromDocument(document: HTMLDocument): Device[] {
-    const names = this._parseNamesFrom(document);
-    const ids = this._parseIdsFrom(document);
-    if (names.length !== ids.length) {
-      throw new Error(
-        `names and ids are not matched. names: ${names.length}, ids: ${ids.length}`,
-      );
+    // "MacBook" is the only page still using the old layout as of 2024
+    const isRenewed = this._isRenewedWebsite(document);
+    if (!isRenewed) {
+      console.log('[DEBUG] old website detected');
     }
 
-    const devices = names.map((name, i) => {
-      const id = ids[i];
-      return id.map((id) => ({ id, name }));
-    }).flat();
+    const devices = isRenewed
+      ? this._parseDevicesFromSections(document)
+      : this._parseDevicesFromParagraphs(document);
+
+    // an empty result means the layout changed in a way we no longer understand,
+    // so fail loudly instead of silently wiping the existing identifiers
+    if (devices.length === 0) {
+      throw new Error('no devices found. the website layout may have changed.');
+    }
 
     return devices;
   }
 
-  private _parseNamesFrom(document: HTMLDocument): string[] {
-    const names = this._parseTextsFrom(document, 'p.gb-paragraph b');
-
-    // if there's a colon at the end of these field, it's 2024 renewed website
-    // so we need to parse names in new way
-    const is2024Renewed = names.some((name) =>
-      name.endsWith(':') || name.endsWith('：') // japanese colon
-    );
-    if (is2024Renewed) {
-      const names = this._parseTextsFrom(document, 'h2.gb-header')
-        .filter((text) => text.includes('Mac')); // "Learn More" added on MacPro website
-      return names;
-    } else {
-      // 2024 currently, only "MacBook" has old website
-      console.log('[DEBUG] old website detected');
-    }
-
-    return names;
+  private _isRenewedWebsite(document: HTMLDocument): boolean {
+    // the 2024 renewed website labels every field with a bold text ending
+    // with a colon, e.g. "Model Identifier:"
+    return this._parseTextsFrom(document, 'p.gb-paragraph b')
+      .some((text) => text.endsWith(':') || text.endsWith('：')); // japanese colon
   }
 
-  private _parseIdsFrom(document: HTMLDocument): string[][] {
-    const ids = this._parseTextsFrom(document, 'p.gb-paragraph')
-      .map((text) => text.match(/[A-Za-z]+\d+,\d+/g))
-      .filter((match) => match) as string[][];
+  /**
+   * The renewed website puts a device name in a heading and its identifiers in
+   * the paragraphs below it, so we walk the document in order and bind each
+   * paragraph to the nearest heading above it. Headings that own no identifier
+   * (e.g. "Learn more") simply contribute no device.
+   */
+  private _parseDevicesFromSections(document: HTMLDocument): Device[] {
+    const devices: Device[] = [];
+    let name: string | undefined;
 
-    return ids;
+    for (
+      const node of document.querySelectorAll('h2.gb-header, p.gb-paragraph')
+    ) {
+      const text = node.textContent.trim();
+
+      if (node.localName === 'h2') {
+        name = text;
+        continue;
+      }
+
+      // paragraphs before the first heading belong to no device
+      if (name === undefined) continue;
+
+      const deviceName = name;
+      for (const id of this._parseIdsFrom(text)) {
+        devices.push({ id, name: deviceName });
+      }
+    }
+
+    return devices;
+  }
+
+  /**
+   * The old website has no heading per device: a paragraph holding nothing but
+   * a bold text names the device, and the paragraphs after it carry its
+   * identifiers. So we walk the paragraphs and bind them the same way.
+   */
+  private _parseDevicesFromParagraphs(document: HTMLDocument): Device[] {
+    const devices: Device[] = [];
+    let name: string | undefined;
+
+    for (const paragraph of document.querySelectorAll('p.gb-paragraph')) {
+      const text = paragraph.textContent.trim();
+      const bold = paragraph.querySelector('b')?.textContent.trim();
+
+      if (bold && bold === text) {
+        name = bold;
+        continue;
+      }
+
+      // paragraphs before the first name belong to no device
+      if (name === undefined) continue;
+
+      const deviceName = name;
+      for (const id of this._parseIdsFrom(text)) {
+        devices.push({ id, name: deviceName });
+      }
+    }
+
+    return devices;
+  }
+
+  private _parseIdsFrom(text: string): string[] {
+    return text.match(/[A-Za-z]+\d+,\d+/g) ?? [];
   }
 
   private _parseTextsFrom(
