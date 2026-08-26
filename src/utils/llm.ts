@@ -8,8 +8,12 @@ const DEFAULT_MODEL = 'gpt-5.6-luna';
 interface Provider {
   /** Environment variable holding the API key for this provider. */
   apiKeyEnv: string;
-  /** Creates a model factory bound to the given API key. */
-  createModel: (apiKey: string, modelId: string) => LanguageModel;
+  /** Creates a model bound to the given API key. `baseURL` overrides the provider default. */
+  createModel: (
+    apiKey: string,
+    modelId: string,
+    baseURL?: string,
+  ) => LanguageModel;
 }
 
 /**
@@ -19,7 +23,8 @@ interface Provider {
 const PROVIDERS: Record<string, Provider> = {
   openai: {
     apiKeyEnv: 'OPENAI_API_KEY',
-    createModel: (apiKey, modelId) => createOpenAI({ apiKey })(modelId),
+    createModel: (apiKey, modelId, baseURL) =>
+      createOpenAI({ apiKey, baseURL })(modelId),
   },
 };
 
@@ -44,8 +49,9 @@ export class LLM {
 
     this.apiKeyEnv = provider.apiKeyEnv;
     const apiKey = Deno.env.get(provider.apiKeyEnv);
+    const baseURL = Deno.env.get('LLM_BASE_URL') || undefined;
     this.model = apiKey
-      ? provider.createModel(apiKey, this.modelId)
+      ? provider.createModel(apiKey, this.modelId, baseURL)
       : undefined;
   }
 

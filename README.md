@@ -34,7 +34,8 @@ MacBook Pro (16-inch, Nov 2023)
 deno run start:scrape-from-xcode
 
 # macOS (an LLM is optional, it needs to generate `mac-device-identifiers-unique.json`)
-# Defaults to OpenAI `gpt-5.6-luna`; override with LLM_PROVIDER / LLM_MODEL.
+# Defaults to OpenAI `gpt-5.6-luna`; override with LLM_PROVIDER / LLM_MODEL /
+# LLM_BASE_URL (for an OpenAI-compatible endpoint).
 OPENAI_API_KEY=... \
 deno run start:scrape-from-apple
 ```
